@@ -1303,15 +1303,20 @@ class InferHandler : public HandlerBase {
         shm_regions_info_.pop_back();
 
         if (awaiting_unregister) {
-          std::cerr << "============= Found shm - " << shm_name
+          if (shm_manager_ != nullptr) {
+            std::cerr << "============= Found shm - " << shm_name
                     << " marked for Unregistration !! ============\n";
-          auto err = shm_manager_->Unregister(shm_name, shm_memory_type);
-          if (err != nullptr) {
-            std::cerr << "+++++++++++++ Failed to unregister shm - " << shm_name
+            auto err = shm_manager_->Unregister(shm_name, shm_memory_type);
+            if (err != nullptr) {
+                std::cerr << "+++++++++++++ Failed to unregister shm - " << shm_name
                       << " !! ++++++++++++\n";
+              LOG_VERBOSE(1) << TRITONSERVER_ErrorMessage(err);
+            } else {
+                std::cerr << "+++++++++++++ SUCCESS to unregister shm - " << shm_name
+                      << " !! ++++++++++++\n";
+            }
           } else {
-            std::cerr << "+++++++++++++ SUCCESS to unregister shm - " << shm_name
-                      << " !! ++++++++++++\n";
+            LOG_VERBOSE(1) << "Shared memory manager is not available";
           }
         }
       }
