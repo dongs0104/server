@@ -1296,13 +1296,13 @@ class InferHandler : public HandlerBase {
       while (!shm_regions_info_.empty()) {
         auto shm_name = shm_regions_info_.back()->name_;
         auto shm_memory_type = shm_regions_info_.back()->kind_;
-        auto marked_for_unregistration =
-            shm_regions_info_.back()->marked_for_unregistration_;
+        auto awaiting_unregister =
+            shm_regions_info_.back()->awaiting_unregister_;
 
         // Delete shared_ptr to decrement reference count
         shm_regions_info_.pop_back();
 
-        if (marked_for_unregistration) {
+        if (awaiting_unregister) {
           std::cerr << "============= Found shm - " << shm_name
                     << " marked for Unregistration !! ============\n";
           auto err = shm_manager_->Unregister(shm_name, shm_memory_type);

@@ -615,7 +615,7 @@ SharedMemoryManager::GetStatus(
     }
     RETURN_IF_ERR(shm_region.AddUInt("byte_size", it->second->byte_size_));
     RETURN_IF_ERR(shm_region.AddBool(
-        "marked_for_unregistration", it->second->marked_for_unregistration_));
+        "awaiting_unregister", it->second->awaiting_unregister_));
     RETURN_IF_ERR(shm_status->Append(std::move(shm_region)));
   }
 
@@ -688,11 +688,10 @@ SharedMemoryManager::UnregisterHelper(
   auto it = shared_memory_map_.find(name);
   if (it != shared_memory_map_.end() && it->second->kind_ == memory_type) {
     if (it->second.use_count() > 1) {
-      it->second->marked_for_unregistration_ = true;
-      std::cerr << ("Shared memory region '" + name +
-                    "' will be unregistered after in-flight requests complete.")
-                       .c_str()
-                << std::endl;
+      it->second->awaiting_unregister_ = true;
+      LOG_VERBOSE(1)
+          << "Shared memory region '" << name
+          << "' will be unregistered after in-flight requests complete.";
       return nullptr;
     }
 
