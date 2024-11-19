@@ -1448,12 +1448,15 @@ RUN apt-get update \\
     """
 
     if "vllm" in backends:
-        df += """
+        vllm_version = TRITON_VERSION_MAP[FLAGS.version][6]
+        df += f"""
 # vLLM needed for vLLM backend
-RUN pip3 install torch vllm=={}
-""".format(
-            TRITON_VERSION_MAP[FLAGS.version][6]
-        )
+RUN pip3 install torch && \\
+    git clone --depth 1 --branch v{vllm_version} https://github.com/vllm-project/vllm.git && \\
+    cd vllm && python use_existing_torch.py && \\
+    pip3 install -r requirements-build.txt && \\
+    pip3 install -e . --no-build-isolation
+"""
 
     if "dali" in backends:
         df += """
