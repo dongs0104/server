@@ -1450,7 +1450,7 @@ RUN apt-get update \\
     if "vllm" in backends:
         df += """
 # vLLM needed for vLLM backend
-RUN pip3 install vllm=={}
+RUN pip3 install torch vllm=={}
 """.format(
             TRITON_VERSION_MAP[FLAGS.version][6]
         )
