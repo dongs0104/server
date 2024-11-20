@@ -1452,6 +1452,7 @@ RUN apt-get update \\
         df += f"""
 # vLLM needed for vLLM backend
 RUN pip3 install torch && \\
+    apt-get install kmod && \\
     git clone --depth 1 --branch v{vllm_version} https://github.com/vllm-project/vllm.git && \\
     cd vllm && python3 use_existing_torch.py && \\
     pip3 install -r requirements-build.txt && \\
